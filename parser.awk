@@ -5,9 +5,7 @@ BEGIN {
 { reparse() }
 
 $1 == "poke" {
-  player = $2
-  mon = $3
-  key = player"-"mon
+  key = getMonKey($2, $3)
   mons[key] = 100
 }
 
@@ -17,31 +15,28 @@ $1 == "player"  {
 }
 
 $1 == "switch" {
-  if (getPlayer() == "p1a") p1a = $3
-  if (getPlayer() == "p2a") p2a = $3
+  if (getPlayer() == "p1") p1a = getSpecies($3)
+  if (getPlayer() == "p2") p2a = getSpecies($3)
 }
 
 $1 == "-heal" {
   split($3, new_pct, "\\")
   new_hp = new_pct[1] + 0
 
-  if (getPlayer() == "p1a") {
-    mon = p1a
-    key = "p1-"mon
-  } else {
-    mon = p2a
-    key = "p2-"mon
-  }
-    mons[key] = new_hp
+  player = getPlayer()
+  mon = player == "p1" ? p1a : p2a
 
-  # print mon " healed up to " new_hp "% " $4
+  key = getMonKey(player, mon)
+  mons[key] = new_hp
 }
 
 
 
 $1 == "move" {
 
-  if (getPlayer() == "p1a") {
+  player = getPlayer()
+
+  if (player == "p1") {
     attacker = p1a
     defender = p2a
     attacker_hp = mons["p1-"attacker]
@@ -90,7 +85,7 @@ END {
 }
 
 function getPlayer() {
-  return substr($2, 1, 3)
+  return substr($2, 1, 2)
 }
 
 # Remove the leading "|" and reparse the line withouth it
@@ -99,5 +94,16 @@ function getPlayer() {
 function reparse () {
   gsub(/^\|/, "")
   $0 = $0
+}
+
+function getSpecies(mon_extended) {
+  comma_loc = match(mon_extended, ",")
+  return comma_loc > 0 ? substr(mon_extended, 0, comma_loc - 1) : mon_extended
+}
+
+function getMonKey(player, mon) {
+  mon = getSpecies(mon)
+  print mon
+  return player"-"mon
 }
 
