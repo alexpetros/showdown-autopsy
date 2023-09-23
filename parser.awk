@@ -15,8 +15,16 @@ $1 == "player"  {
 }
 
 $1 == "switch" {
-  if (getPlayer() == "p1") p1a = getSpecies($3)
-  if (getPlayer() == "p2") p2a = getSpecies($3)
+  player = getPlayer()
+  mon = getSpecies($3)
+  key = getMonKey(player, mon)
+
+  if (player == "p1") p1a = mon
+  if (player == "p2") p2a = mon
+
+  split($4, new_pct, "\\")
+  hp = new_pct[1] + 0
+  mons[key] = hp
 }
 
 $1 == "-heal" {
@@ -103,7 +111,6 @@ function getSpecies(mon_extended) {
 
 function getMonKey(player, mon) {
   mon = getSpecies(mon)
-  print mon
   return player"-"mon
 }
 
