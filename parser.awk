@@ -30,9 +30,6 @@ $1 == "switch" {
   if (player == "p2") { old_mon = p2a; p2a = mon }
 
   print player " switched out " old_mon " for " mon
-
-  hp = parse_hp($4)
-  set_hp(player, mon, hp)
 }
 
 $1 == "-heal" {
@@ -52,8 +49,6 @@ $1 == "move" {
 
 $1 == "-damage" {
   player = get_player($2)
-
-  player = substr($2, 0, 2)
   mon = player == "p1" ? p1a : p2a
   prev_hp = get_hp(player, mon)
   new_hp = parse_hp($3)
@@ -65,8 +60,21 @@ $1 == "-damage" {
     print "It did " damage "% to " mon " (" new_hp "%)"
   }
 
-  if (new_hp == 0) print mon " fainted."
+  if (new_hp == 0) {
+    opp_player = player == "p2" ? "p1" :"p2"
+    opp_mon = player == "p2" ? p1a : p2a
+    kills[opp_player"-"opp_mon] += 1
+    deaths[player"-"mon] = 1
+    print mon " fainted."
+  }
   set_hp(player, mon, new_hp)
+}
+
+END {
+  print "\nKills:"
+  for (mon in kills) print mon, kills[mon]
+  print "\nDeaths:"
+  for (mon in deaths) print mon, deaths[mon]
 }
 
 function get_player(pokemon_id) {
@@ -77,7 +85,6 @@ function get_species(mon_extended) {
   comma_loc = match(mon_extended, ",")
   return comma_loc > 0 ? substr(mon_extended, 0, comma_loc - 1) : mon_extended
 }
-
 
 function get_hp(player, mon) {
   mon = get_species(mon)
