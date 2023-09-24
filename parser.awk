@@ -1,5 +1,6 @@
 BEGIN {
   FS="|"
+  BATTLE_LOG = "DEBUG" in ENVIRON
 }
 
 # Remove the leading "|" and reparse the line withouth it
@@ -7,8 +8,7 @@ BEGIN {
 # Just a little quality-of-life hack
 { gsub(/^\|/, ""); $0 = $0 }
 
-$1 == "poke" { set_hp($2, $3, 100)
-}
+$1 == "poke" { set_hp($2, $3, 100) }
 
 $1 == "player"  {
   if ($2 == "p1") p1 = $3
@@ -16,10 +16,10 @@ $1 == "player"  {
 }
 
 $1 == "turn" {
-  p1a_health = get_hp("p1", p1a)
-  p2a_health = get_hp("p2", p2a)
-  printf "End of turn %d: %s (%d%%), %s (%d%%)\n\n", $2-1, p1a, p1a_health, p2a, p2a_health
-  printf ("Turn %d\n", $2)
+  p1a_hp = get_hp("p1", p1a)
+  p2s_hp = get_hp("p2", p2a)
+  battle_log(sprintf("End of turn %d: %s (%d%%), %s (%d%%)\n", $2-1, p1a, p1a_hp, p2a, p2s_hp))
+  battle_log(sprintf("Turn %d", $2))
 }
 
 $1 == "switch" {
@@ -29,7 +29,14 @@ $1 == "switch" {
   if (player == "p1") { old_mon = p1a; p1a = mon }
   if (player == "p2") { old_mon = p2a; p2a = mon }
 
-  print player " switched out " old_mon " for " mon
+  battle_log(player " switched out " old_mon " for " mon)
+}
+
+$1 == "move" {
+  player = get_player($2)
+  move = $3
+  attacker = player == "p1" ? p1a : p2a
+  battle_log(attacker " used " move)
 }
 
 $1 == "-heal" {
@@ -37,14 +44,6 @@ $1 == "-heal" {
   mon = player == "p1" ? p1a : p2a
   new_hp = parse_hp($3)
   set_hp(player, mon, new_hp)
-}
-
-$1 == "move" {
-  player = get_player($2)
-  move = $3
-
-  attacker = player == "p1" ? p1a : p2a
-  print attacker " used " move
 }
 
 $1 == "-damage" {
@@ -55,9 +54,9 @@ $1 == "-damage" {
   damage = prev_hp - new_hp
 
   if ($4) {
-    print mon " took " damage"% " $4
+    battle_log(mon " took " damage"% " $4)
   } else {
-    print "It did " damage "% to " mon " (" new_hp "%)"
+    battle_log("It did " damage "% to " mon " (" new_hp "%)")
   }
 
   if (new_hp == 0) {
@@ -65,8 +64,9 @@ $1 == "-damage" {
     opp_mon = player == "p2" ? p1a : p2a
     kills[opp_player"-"opp_mon] += 1
     deaths[player"-"mon] = 1
-    print mon " fainted."
+    battle_log(mon " fainted.")
   }
+
   set_hp(player, mon, new_hp)
 }
 
@@ -102,3 +102,6 @@ function parse_hp(hp_pct) {
   return hp
 }
 
+function battle_log(message) {
+  if (BATTLE_LOG) print message
+}

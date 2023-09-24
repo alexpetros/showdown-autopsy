@@ -3,7 +3,13 @@ A mildly-reasonable tool to translate Showdown battle logs into SQL data about b
 awk.
 
 ## Usage
-`awk -f parser.awk BATTLE_LOG_FILEPATH`
+```
+# Display the stats
+awk -f parser.awk BATTLE_LOG_FILEPATH
+
+# Add DEBUG to show the entire battle parsing
+DEBUG=1 awk -f parser.awk BATTLE_LOG_FILEPATH
+```
 
 ## Why?
 I would like to be able to create stats out of the battles from my Showdown Draft League, and
