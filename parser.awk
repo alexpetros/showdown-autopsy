@@ -15,7 +15,10 @@ $1 == "player"  {
 }
 
 $1 == "turn" {
-  printf ("\nTurn %d\n", $2)
+  p1a_health = mons[getMonKey("p1", p1a)]
+  p2a_health = mons[getMonKey("p2", p2a)]
+  printf "End of turn %d: %s (%d%%), %s (%d%%)\n\n", $2-1, p1a, p1a_health, p2a, p2a_health
+  printf ("Turn %d\n", $2)
 }
 
 $1 == "switch" {
@@ -28,15 +31,12 @@ $1 == "switch" {
 
   print player " switched out " old_mon " for " mon
 
-  split($4, new_pct, "\\")
-  hp = new_pct[1] + 0
+  hp = parse_hp($4)
   mons[key] = hp
 }
 
 $1 == "-heal" {
-  split($3, new_pct, "\\")
-  new_hp = new_pct[1] + 0
-
+  new_hp = parse_hp($3)
   player = getPlayer()
   mon = player == "p1" ? p1a : p2a
 
@@ -47,53 +47,44 @@ $1 == "-heal" {
 
 
 $1 == "move" {
-
   player = getPlayer()
   move = $3
 
-  if (player == "p1") {
-    attacker = p1a
-    defender = p2a
-    attacker_hp = mons["p1-"attacker]
-    defender_hp = mons["p2-"defender]
-  } else {
-    attacker = p2a
-    defender = p1a
-    attacker_hp = mons["p2-"attacker]
-    defender_hp = mons["p1-"defender]
-  }
-
+  attacker = player == "p1" ? p1a : p2a
   print attacker " used " move
+}
 
-  while ($1 != "-damage" && $1 != "") {
-    getline
-    reparse()
+$1 == "-damage" {
+  player = getPlayer()
+
+  if ($4) {
+    player = substr($2, 0, 2)
+    mon = player == "p1" ? p1a : p2a
+    defender_key = getMonKey(player, mon)
+    prev_hp = mons[defender_key]
+    new_hp = parse_hp($3)
+    print mon " took " prev_hp - new_hp " " $4
+  } else {
+
+    if (player == "p1") {
+      defender = p1a
+      defender_hp = mons["p1-"defender]
+      defender_key = getMonKey("p1", defender)
+    } else {
+      defender = p2a
+      defender_hp = mons["p2-"defender]
+      defender_key = getMonKey("p2", defender)
+    }
+
+    new_hp = parse_hp($3)
+
+    damage = defender_hp - new_hp
+    print "It did " damage "% to " defender " (" new_hp "%)"
   }
 
-  if ($1 == "-damage") {
+  if (new_hp == "0") print defender " fainted."
 
-    if (substr($3, 0, 1) == "0") {
-      new_defender_hp = 0
-    } else {
-      split($3, new_pct, "\\")
-      new_defender_hp = new_pct[1] + 0
-    }
-
-    damage = defender_hp - new_defender_hp
-
-
-    if (new_defender_hp == "0") {
-      print attacker " killed " defender
-    } else {
-      print "It did " damage "% to " defender " (" new_defender_hp "%)"
-    }
-
-    if (getPlayer() == "p1") {
-      mons["p1-"defender] = new_defender_hp
-    } else {
-      mons["p2-"defender] = new_defender_hp
-    }
-  }
+  mons[defender_key] = new_hp
 
 }
 
@@ -117,5 +108,11 @@ function getSpecies(mon_extended) {
 function getMonKey(player, mon) {
   mon = getSpecies(mon)
   return player"-"mon
+}
+
+function parse_hp(hp_pct) {
+  split(hp_pct, new_pct, "\\")
+  hp = new_pct[1] + 0
+  return hp
 }
 
