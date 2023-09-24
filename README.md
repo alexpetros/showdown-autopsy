@@ -1,4 +1,4 @@
-# Showdown Protocol SQLizer
+# Pokemon Showdown Battlelog SQLizer
 A mildly-reasonable tool to translate Showdown battle logs into SQL data about battles, written in
 awk.
 
@@ -11,3 +11,6 @@ analyze them with SQL. I also want to generate the wins/losses/kills/deaths shee
 
 ## Why awk?
 I like awk, and it's perfect for structured, line-based data.
+
+## What protocol?
+The [Pokemon Showdown Battle Protocol](https://github.com/smogon/pokemon-showdown/blob/master/sim/SIM-PROTOCOL.md)
