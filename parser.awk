@@ -14,13 +14,19 @@ $1 == "player"  {
   if ($2 == "p2") p2 = $3
 }
 
+$1 == "turn" {
+  printf ("\nTurn %d\n", $2)
+}
+
 $1 == "switch" {
   player = getPlayer()
   mon = getSpecies($3)
   key = getMonKey(player, mon)
 
-  if (player == "p1") p1a = mon
-  if (player == "p2") p2a = mon
+  if (player == "p1") { old_mon = p1a; p1a = mon }
+  if (player == "p2") { old_mon = p2a; p2a = mon }
+
+  print player " switched out " old_mon " for " mon
 
   split($4, new_pct, "\\")
   hp = new_pct[1] + 0
@@ -43,6 +49,7 @@ $1 == "-heal" {
 $1 == "move" {
 
   player = getPlayer()
+  move = $3
 
   if (player == "p1") {
     attacker = p1a
@@ -56,6 +63,7 @@ $1 == "move" {
     defender_hp = mons["p1-"defender]
   }
 
+  print attacker " used " move
 
   while ($1 != "-damage" && $1 != "") {
     getline
@@ -73,22 +81,19 @@ $1 == "move" {
 
     damage = defender_hp - new_defender_hp
 
+
     if (new_defender_hp == "0") {
-      print attacker " ("attacker_hp"%)" " killed " defender
+      print attacker " killed " defender
     } else {
-      print attacker " ("attacker_hp"%)" " did " damage "% to " defender " (" new_defender_hp "%)"
+      print "It did " damage "% to " defender " (" new_defender_hp "%)"
     }
 
-    if (getPlayer() == "p1a") {
+    if (getPlayer() == "p1") {
       mons["p1-"defender] = new_defender_hp
     } else {
       mons["p2-"defender] = new_defender_hp
     }
   }
-
-}
-
-END {
 
 }
 
