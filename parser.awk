@@ -1,6 +1,12 @@
+#!awk -f
+
 BEGIN {
   FS="|"
   BATTLE_LOG = "DEBUG" in ENVIRON
+}
+
+FNR == 1 {
+  delete mons
 }
 
 # Remove the leading "|" and reparse the line withouth it
@@ -8,11 +14,18 @@ BEGIN {
 # Just a little quality-of-life hack
 { gsub(/^\|/, ""); $0 = $0 }
 
-$1 == "poke" { set_hp($2, $3, 100) }
 
 $1 == "player"  {
   if ($2 == "p1") p1 = $3
   if ($2 == "p2") p2 = $3
+}
+
+$1 == "poke" {
+  set_hp($2, $3, 100)
+
+  player_name = $2 == "p1" ? p1 : p2
+  mon = get_species($3)
+  starts[player_name"-"mon] += 1
 }
 
 $1 == "turn" {
@@ -60,10 +73,14 @@ $1 == "-damage" {
   }
 
   if (new_hp == 0) {
-    opp_player = player == "p2" ? "p1" :"p2"
+    player_name = player == "p1" ? p1 : p2
+    opp_player_name = player == "p2" ? p1 : p2
     opp_mon = player == "p2" ? p1a : p2a
-    kills[opp_player"-"opp_mon] += 1
-    deaths[player"-"mon] = 1
+
+    # for (mon in kills) print mon, kills[mon];
+
+    kills[opp_player_name"-"opp_mon] += 1
+    deaths[player_name"-"mon] += 1
     battle_log(mon " fainted.")
   }
 
@@ -71,10 +88,18 @@ $1 == "-damage" {
 }
 
 END {
-  print "\nKills:"
-  for (mon in kills) print mon, kills[mon]
-  print "\nDeaths:"
-  for (mon in deaths) print mon, deaths[mon]
+  # for (mon in kills) print mon, kills[mon]
+  for (mon in starts) {
+    total_appearances = starts[mon]
+    total_kills = kills[mon] > 0 ? kills[mon] : 0
+    total_deaths = deaths[mon] > 0 ? deaths[mon] : 0
+
+    split(mon, name_split, "-")
+    player_name = name_split[1]
+    mon_name = name_split[2]
+
+    printf ("%s:%s:%s:%s:%s\n", player_name, mon_name, total_appearances, total_kills, total_deaths)
+  }
 }
 
 function get_player(pokemon_id) {
