@@ -77,8 +77,6 @@ $1 == "-damage" {
     opp_player_name = player == "p2" ? p1 : p2
     opp_mon = player == "p2" ? p1a : p2a
 
-    # for (mon in kills) print mon, kills[mon];
-
     kills[opp_player_name"-"opp_mon] += 1
     deaths[player_name"-"mon] += 1
     battle_log(mon " fainted.")
@@ -88,7 +86,6 @@ $1 == "-damage" {
 }
 
 END {
-  # for (mon in kills) print mon, kills[mon]
   for (mon in starts) {
     total_appearances = starts[mon]
     total_kills = kills[mon] > 0 ? kills[mon] : 0
