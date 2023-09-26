@@ -36,6 +36,9 @@ And you can add `DEBUG=1` if you want to print out the actual turns of the battl
 DEBUG=1 awk -f parser.awk BATTLE_LOG_FILEPATH
 ```
 
+I also included a `get-logs.sh` function which will read a list of links from STDIN and download
+them to the `logs/` directory in this repo.
+
 ## Why?
 I would like to be able to create stats out of the battles from my Showdown Draft League, and
 analyze them with SQL. I also want to generate the wins/losses/kills/deaths sheet.
