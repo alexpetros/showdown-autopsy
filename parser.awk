@@ -3,6 +3,8 @@
 BEGIN {
   FS="|"
   BATTLE_LOG = "DEBUG" in ENVIRON
+  SPLIT = "SPLIT" in ENVIRON
+  games=0
 }
 
 FNR == 1 {
@@ -85,7 +87,24 @@ $1 == "-damage" {
   set_hp(player, mon, new_hp)
 }
 
+$1 == "win" {
+  games += 1
+}
+
+$1 == "win" && SPLIT {
+  print "Game "games " - " p1 " vs " p2
+  outputStats()
+  delete starts
+  delete kills
+  delete deaths
+  print ""
+}
+
 END {
+  if (!SPLIT) outputStats()
+}
+
+function outputStats () {
   for (mon in starts) {
     total_appearances = starts[mon]
     total_kills = kills[mon] > 0 ? kills[mon] : 0

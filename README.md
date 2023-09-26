@@ -4,7 +4,7 @@ POSIX-compatible awk, so it should work with literally any awk installation you 
 
 The only pre-requisite is that you have to understand some command-line basics.
 
-I'm still working on this so the interface is subject to change.
+I'm still working on this so the interface is subject to change (right now it's not that great).
 
 ## Installation
 Just download this repo and run the `parser.awk` script with any showdown battle log as the STDIN.
@@ -33,9 +33,13 @@ Battlesql can parse multiple logs and aggregate the results no problem:
 ./parser.awk < ./logs/.*log
 ```
 
-And you can add `DEBUG=1` if you want to print out the actual turns of the battle as well.
+Add `SPLIT=1` if you want to print out the results game by game instead of all aggregated.
 ```bash
-# Add DEBUG if you want to pretty-print the battle
+SPLIT=1 awk -f parser.awk BATTLE_LOG_FILEPATH
+```
+
+Add `DEBUG=1` if you want to print out the actual turns of the battle as well.
+```bash
 DEBUG=1 awk -f parser.awk BATTLE_LOG_FILEPATH
 ```
 
