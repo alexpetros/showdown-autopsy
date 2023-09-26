@@ -74,6 +74,10 @@ pop punk pelosi     Hydreigon     9   10  4
 I would like to be able to create stats out of the battles from my Showdown Draft League, and
 analyze them with SQL. I also want to generate the wins/losses/kills/deaths sheet.
 
+What's nifty about this parser is that it isn't just parsing each statement line-by-line, it's
+updating an internal state about the game being played. For this reason it's very easy to extend to
+collect new stats, and, in theory, could be easily extended into a CLI Showdown client.
+
 ## Why awk?
 awk is goated when parsing structured, line-based data is the vibe
 

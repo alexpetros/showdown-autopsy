@@ -7,15 +7,15 @@ BEGIN {
   games=0
 }
 
-FNR == 1 {
-  delete mons
-}
-
 # Remove the leading "|" and reparse the line withouth it
 # This let us access the first field as $1 instead of $2
 # Just a little quality-of-life hack
 { gsub(/^\|/, ""); $0 = $0 }
 
+# Every time a new file is read, delete the mons from the old one
+FNR == 1 {
+  delete mons
+}
 
 $1 == "player"  {
   if ($2 == "p1") p1 = $3
@@ -91,6 +91,7 @@ $1 == "win" {
   games += 1
 }
 
+# Only print the stats and reset them if the user supplied the SPLIT option
 $1 == "win" && SPLIT {
   print "Game "games " - " p1 " vs " p2
   outputStats()
@@ -100,6 +101,8 @@ $1 == "win" && SPLIT {
   print ""
 }
 
+# If there was no split option, then output the stats at the very end
+# Note that END signifies the END of all input, not the end of a file
 END {
   if (!SPLIT) outputStats()
 }
