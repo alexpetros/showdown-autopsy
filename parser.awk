@@ -24,9 +24,15 @@ $1 == "player"  {
 
 $1 == "poke" {
   set_hp($2, $3, 100)
-
   player_name = $2 == "p1" ? p1 : p2
   mon = get_species($3)
+
+  # This is a hack that just removes the forme wildcard since none of the mons
+  # we're using have legal formes (i.e. Greninja-* is just Greninja)
+  # TODO More robust forme handling
+  forme_wildcard = match(mon, /-\*/)
+  if (forme_wildcard) mon = substr(mon, 0, forme_wildcard -1)
+
   starts[player_name"-"mon] += 1
 }
 
@@ -113,9 +119,9 @@ function outputStats () {
     total_kills = kills[mon] > 0 ? kills[mon] : 0
     total_deaths = deaths[mon] > 0 ? deaths[mon] : 0
 
-    split(mon, name_split, "-")
-    player_name = name_split[1]
-    mon_name = name_split[2]
+    split_index = match(mon, "-")
+    player_name = substr(mon, 0, split_index - 1)
+    mon_name = substr(mon, split_index + 1)
 
     printf ("%s:%s:%s:%s:%s\n", player_name, mon_name, total_appearances, total_kills, total_deaths)
   }
