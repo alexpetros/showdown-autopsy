@@ -9,7 +9,7 @@ I'm still working on this so the interface is subject to change (right now it's 
 ## Installation
 Just download this repo and run the `parser.awk` script with any showdown battle log as the STDIN.
 
-To get a battle log, you can just append `.log` to the URL or any showdown replay. Save the contents
+To get a battle log, you can just append `.log` to the URL of any showdown replay. Save the contents
 of that file somewhere, and substitute in the filepath anywhere you see `BATTLE_LOG_FILEPATH` below.
 
 ## Usage
