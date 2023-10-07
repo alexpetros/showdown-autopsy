@@ -1,0 +1,46 @@
+#!/bin/sh
+set -euo pipefail
+
+function usage {
+  echo "Usage: autopsy [-sdh] [file...]"
+  exit 1
+}
+
+function help {
+  cat <<EOF
+autospy
+Alex Petros
+
+autospy parses Pokemon Showdown Battle logs and outputs a variety of stats about
+the players and the pokemon that participated in those battles. In its default
+state, it outputs colon-delimited stats, but options are provided to output a
+running game log, or game-specific stats as well.
+
+USAGE:
+  autopsy [OPTIONS] [file...]
+  command | autopsy [OPTIONS]
+
+OPTIONS:
+  -h        display this help page
+  -s        output each game's stats separately
+  -r        output the game as a replay log
+EOF
+exit 0
+}
+
+while getopts "hsd" opt; do
+  case "$opt" in
+    h|\?) help ;;
+    s)  export SPLIT=1 ;;
+    r)  export REPLAY=1 ;;
+  esac
+done
+
+# OPTIND is set to the first non-option argument
+# So this command shifts past all the option args
+shift $((OPTIND-1))
+
+# Shift one more time if the user provided the -- arg
+[ "${1:-}" = "--" ] && shift
+
+awk -f ./parser.awk $@

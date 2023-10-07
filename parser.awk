@@ -1,8 +1,6 @@
-#!awk -f
-
 BEGIN {
   FS="|"
-  BATTLE_LOG = "DEBUG" in ENVIRON
+  BATTLE_LOG = "REPLAY" in ENVIRON
   SPLIT = "SPLIT" in ENVIRON
   games=0
 }

@@ -1,8 +1,8 @@
-# Pokemon Showdown Battlelog SQLizer
-A mildly-reasonable tool to translate Showdown battle logs into SQL data about battles. Written in
-POSIX-compatible awk, so it should work with literally any awk installation you have.
+# Autopsy - Pokemon Showdown Battle Reports
+A mildly-reasonable tool to translate Showdown battle logs into data. Written POSIX-compatible awk,
+so it should work with literally any awk installation you have.
 
-The only pre-requisite is that you have to understand command-line basics like pipes.
+The only pre-requisite is that you have to understand command-line basics (pipes, STDIN, and so on).
 
 I'm still working on this so the interface is subject to change (right now it's not that great).
 
@@ -15,11 +15,11 @@ of that file somewhere, and use that file(s) in any of the examples below.
 ## Quickstart
 If you have a local awk installation (you do) you can invoke the parser directly, with a filepath:
 
-* Analyze a single battle: `./parser.awk test-log.log`
-* Analyze multiple battles (uses shell filepath glob): `./parser.awk logs/*.log`
-* Analyze multiple battles (uses STDIN): `cat logs/*.log | ./parser.awk`
-* Analyze multiple battles, but print individual results: `SPLIT=1 ./parser.awk < logs/*.log`
-* Print out a play by play of a battle: `DEBUG=1 ./parser.awk BATTLE_LOG_FILEPATH`
+* Analyze a single battle: `./autopsy test-log.log`
+* Analyze multiple battles (uses shell filepath glob): `autopsy logs/*.log`
+* Analyze multiple battles (uses STDIN): `cat logs/*.log | autopsy`
+* Analyze multiple battles, but print individual results: `autopsy -s < logs/*.log`
+* Print out a play by play of a battle: `autopsy -r BATTLE_LOG_FILEPATH`
 
 Stats are output in colon-delimited form:
 ```sh
