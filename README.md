@@ -1,6 +1,6 @@
 # Autopsy - Pokemon Showdown Battle Reports
-A mildly-reasonable tool to translate Showdown battle logs into data. Written POSIX-compatible awk,
-so it should work with literally any awk installation you have.
+A mildly-reasonable tool to translate [Pokemon Showdown](https://play.pokemonshowdown.com/) battle logs into data.
+Written POSIX-compatible awk, so it should work with literally any awk installation you have.
 
 The only pre-requisite is that you have to understand command-line basics (pipes, STDIN, and so on).
 
@@ -69,6 +69,9 @@ Muk Muk Goodra      Roaring Moon  9   11  4
 wangstaaa           Dragonite     9   10  4
 pop punk pelosi     Hydreigon     9   10  4
 ```
+
+## Limitations
+* Not all formes work properly, most notable Arceus
 
 ## Why?
 I would like to be able to create stats out of the battles from my Showdown Draft League, and
